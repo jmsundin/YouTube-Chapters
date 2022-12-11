@@ -1,0 +1,20 @@
+{
+  "name": "youtube-chapters",
+  "version": "1.0.0",
+  "description": "A Web Broswer extension to add chapter outlines to YouTube videos to quickly navigate to specific parts of the video.",
+  "scripts": {
+    "start": "parcel watch manifest.json --host localhost --config @parcel/config-webextension",
+    "build": "parcel build manifest.json --config @parcel/config-webextension"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@parcel/config-webextension": "^2.8.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "process": "^0.11.10"
+  }
+}

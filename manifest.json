@@ -1,0 +1,21 @@
+{
+    "manifest_version": 3,
+    "name": "YouTube Chapters",
+    "version": "0.0.1",
+    "description": "A Web Broswer extension to add chapter outlines to YouTube videos to quickly navigate to specific parts of the video.",
+    "icons": {
+        "16": "./src/assets/icons/YouTubeChaptersIcon512x512.png",
+        "32": "./src/assets/icons/YouTubeChaptersIcon512x512.png",
+        "48": "./src/assets/icons/YouTubeChaptersIcon512x512.png",
+        "128": "./src/assets/icons/YouTubeChaptersIcon512x512.png"
+    },
+    "action": {
+      "default_icon": {
+        "16": "./src/assets/icons/YouTubeChaptersIcon512x512.png",
+        "32": "./src/assets/icons/YouTubeChaptersIcon512x512.png"
+      },
+      "default_title": "YouTube Chapters",
+      "default_popup": "./src/popup.html"
+    }
+  }
+  
