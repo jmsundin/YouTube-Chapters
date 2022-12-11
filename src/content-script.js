@@ -9,6 +9,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log("process.env.ASSEMBLYAI_API_KEY: ", process.env.ASSEMBLYAI_API_KEY);
 
   if (request.url) {
+    console.log("content-script request.url: ", request.url);
     // Make a request to the AssemblyAI API using the active tab URL
     const params = {
       headers: {

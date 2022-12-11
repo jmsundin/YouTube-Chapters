@@ -24,14 +24,16 @@
     "content_scripts": [
       {
         "matches": ["https://www.youtube.com/*"],
-        "js": ["./src/content-script.js"],
-        "run_at": "document_end"
+        "js": ["./src/content-script.js"]
       }
     ],
     "permissions": [
       "storage",
       "tabs",
       "webRequest"
+    ],
+    "host_permissions": [
+      "https://*/"
     ]
   }
   

@@ -5,22 +5,7 @@ import "./App.css";
 const App = () => {
   const [chapters, setChapters] = useState([]);
   const [activeTabUrl, setActiveTabUrl] = useState("");
-
-  // Send a message to the content script to get the active tab URL
-  function sendMessageToContentScript(activeTabUrl) {
-    chrome.tabs.sendMessage(tabs[0].id, { url: activeTabUrl }, (response) => {
-      if (Object.keys(response).length > 0) {
-        // The content script was able to make a request to the AssemblyAI API and process the response
-        // The response object contains the transcript and the chapters
-        setChapters(response.chapters);
-      } else {
-        // There was an error making the request to the AssemblyAI API
-        // The response object contains the error message
-        const { error } = response;
-        console.error(error);
-      }
-    });
-  }
+  const [activeTabID, setActiveTabID] = useState(0);
 
   // Listen for messages from the content script
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -39,13 +24,29 @@ const App = () => {
     // Get the active tab url
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       // The URL of the active tab is stored in the first element of the `tabs` array
+      //   console.log("Active tab URL: ", tabs[0].url);
       setActiveTabUrl(tabs[0].url);
-      //   const pElem = document.createElement("p");
-      //   pElem.textContent = activeTabUrl;
-      //   document.body.appendChild(pElem);
-      
+      setActiveTabID(tabs[0].id);
+
       // Send a message containing the active tab URL to the content script
-      sendMessageToContentScript(activeTabUrl);
+      sendMessageToContentScript();
+    });
+  }
+
+  // Send a message to the content script to get the active tab URL
+  function sendMessageToContentScript() {
+    chrome.tabs.sendMessage(activeTabID, { url: activeTabUrl }, (response) => {
+      console.log("Response: ", response);
+      if (response !== undefined && Object.keys(response).length > 0) {
+        // The content script was able to make a request to the AssemblyAI API and process the response
+        // The response object contains the chapters
+        setChapters(response.chapters);
+      } else {
+        // There was an error making the request to the AssemblyAI API
+        // The response object contains the error message
+        const { error } = response;
+        console.error(error);
+      }
     });
   }
 
@@ -66,15 +67,21 @@ const App = () => {
   }
 
   return (
-    <div>
-      <h1>YouTube Chapters</h1>
-      <Button type="submit" onClick={() => getVideoChapters()} disabled={false}>
-        Get Outline of Video
-      </Button>
+    <>
+      <div className="header">
+        <h1>YouTube Chapters</h1>
+        <Button
+          type="submit"
+          onClick={() => getVideoChapters()}
+          disabled={false}
+        >
+          Get Outline of Video
+        </Button>
+      </div>
       <div className="chapters">
         {chapters.length > 0 ? addChapters(chapters) : null}
       </div>
-    </div>
+    </>
   );
 };
 
