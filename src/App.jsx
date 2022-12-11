@@ -1,24 +1,16 @@
-import React, { useState } from "react";
+import * as dotenv from "dotenv";
+dotenv.config({ path: "../.env" });
+
+import React, { useState, useEffect } from "react";
 import Button from "./components/Button";
 import "./App.css";
 
 const App = () => {
+  const assemblyAIEndpoint = "https://api.assemblyai.com/v2/transcript";
+
   const [chapters, setChapters] = useState([]);
   const [activeTabUrl, setActiveTabUrl] = useState("");
   const [activeTabID, setActiveTabID] = useState(0);
-
-  // Listen for messages from the content script
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    // Listen for messages containing the active tab URL
-    if (request.url) {
-      // Make a request to the AssemblyAI API using the active tab URL
-
-      // Process the response from the AssemblyAI API
-
-      // Send a response back to the background script to indicate that the request was successful
-      sendResponse({ success: true });
-    }
-  });
 
   function getVideoChapters() {
     // Get the active tab url
@@ -29,25 +21,47 @@ const App = () => {
       setActiveTabID(tabs[0].id);
 
       // Send a message containing the active tab URL to the content script
-      sendMessageToContentScript();
+      //   sendMessageToContentScript();
+
+      let params = {
+        headers: {
+          authorization: process.env.ASSEMBLYAI_API_KEY,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          audio_url: activeTabUrl,
+          auto_chapters: true,
+        }),
+        method: "POST",
+      };
+
+      fetch(assemblyAIEndpoint, params)
+        .then((response) => response.json())
+        .then((data) => {
+          // Send the response back to the popup
+          console.log("data returned to popup: ", JSON.stringify(data));
+          setChapters(data.chapters);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     });
   }
 
   // Send a message to the content script to get the active tab URL
   function sendMessageToContentScript() {
-    chrome.tabs.sendMessage(activeTabID, { url: activeTabUrl }, (response) => {
-      console.log("Response: ", response);
-      if (response !== undefined && Object.keys(response).length > 0) {
-        // The content script was able to make a request to the AssemblyAI API and process the response
-        // The response object contains the chapters
-        setChapters(response.chapters);
-      } else {
-        // There was an error making the request to the AssemblyAI API
-        // The response object contains the error message
-        const { error } = response;
-        console.error(error);
+    chrome.tabs.sendMessage(
+      (tabId = activeTabID),
+      (message = { url: activeTabUrl }),
+      (response) => {
+        console.log("Response: ", response);
+        if (response !== undefined && Object.keys(response).length > 0) {
+          // The content script was able to make a request to the AssemblyAI API and process the response
+          // The response object contains the chapters
+          setChapters(response.chapters);
+        }
       }
-    });
+    );
   }
 
   function addChapters(chapters) {
@@ -70,17 +84,12 @@ const App = () => {
     <>
       <div className="header">
         <h1>YouTube Chapters</h1>
-        <Button
-          type="submit"
-          onClick={() => getVideoChapters()}
-          disabled={false}
-        >
-          Get Outline of Video
+        <Button type="button" onClick={getVideoChapters()} disabled={false}>
+          Get Chapters for this Video
         </Button>
       </div>
-      <div className="chapters">
-        {chapters.length > 0 ? addChapters(chapters) : null}
-      </div>
+      <div className="active-tab-url">{activeTabUrl}</div>
+      <div className="chapters">{chapters && addChapters(chapters)}</div>
     </>
   );
 };
