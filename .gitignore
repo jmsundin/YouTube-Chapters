@@ -6,3 +6,12 @@ dist
 
 # Ignore .parcel-cache folder
 .parcel-cache
+
+# Ignore .cache folder
+.cache
+
+# Ignore .vscode folder
+.vscode
+
+# Ignore .env file
+.env

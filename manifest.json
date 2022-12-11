@@ -16,6 +16,22 @@
       },
       "default_title": "YouTube Chapters",
       "default_popup": "./src/popup.html"
-    }
+    },
+    "background": {
+      "service_worker": "./src/background.js",
+      "type": "module"
+    },
+    "content_scripts": [
+      {
+        "matches": ["https://www.youtube.com/*"],
+        "js": ["./src/content-script.js"],
+        "run_at": "document_end"
+      }
+    ],
+    "permissions": [
+      "storage",
+      "tabs",
+      "webRequest"
+    ]
   }
   
